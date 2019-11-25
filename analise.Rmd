@@ -1,0 +1,346 @@
+---
+title: "Análise trimestre"
+author: "Falnésio Ghander Soares Borges"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+rm(list = ls())
+modelo.escolhido <- "A1"
+```
+
+
+É importante rodar esse script, pois abrirá e, caso não tenha, instalará o que for necessário.
+```{r carregar bibliotecas, include=FALSE}
+require(ggplot2)
+require(ggforce)
+require(plotly)
+require(readr)
+require(readxl)
+require(dplyr)
+```
+
+Quando queremos analisar uma determinada tabela, colocamos seu nome associado a "dados.modelagem". Os dados reais associamos a "dados.reais".
+
+```{r escolher tabelas, include=FALSE}
+#Local da pasta de dados modelados
+pasta.modelado <- ""
+#Local do arquivo de dados reais
+arquivo.real <- ""
+
+# Modelos
+# A0-C0
+# B0-D0
+# A1-C1
+# B1-D1
+# A2-C2
+# A3-C3
+
+modelo <- function(x){
+  dados.modelagem <<- paste0(pasta.modelado,x,"-geral.csv")
+  if(x == "A0"){
+    colunas <- c("text", #período
+        "numeric", "numeric", # PIB, consumo - VALORES ENCADEADOS A PREÇOS DE 1995
+        "skip", "skip", # PIB, consumo x 1.000.000
+        "skip", "skip", "skip", # POP Cubic, POP Denton, POP linear
+        "skip", "skip", # PIB per cabita Cubic, PIB per capita Denton
+        "skip", # consumo per capita Cubic
+        "skip", 
+        "skip", "skip", # PIB, consumo - VALORES ENCADEADOS A PREÇOS DE 1995 COM AJUSTE
+        "skip", "skip", # PIB, consumo x 1.000.000
+        "skip", "skip", "skip", # POP Cubic, POP Denton, POP linear
+        "skip", "skip", # PIB per cabita Cubic, PIB per capita Denton
+        "skip", # consumo per capita Cubic
+        "skip",
+        "skip", # período SÉRIE ENCADEADA DO ÍNDICE DE VOLUME TRIMESTRAL COM AJUSTE SAZONAL
+        "skip","skip", # PIB, consumo
+        "skip",
+        "skip","skip" # PIB, consumo SÉRIE ENCADEADA DO ÍNDICE DE VOLUME TRIMESTRAL 
+        )
+  } else if (x == "A1"){
+        colunas <- c("text", #período
+        "skip", "skip", # PIB, consumo - VALORES ENCADEADOS A PREÇOS DE 1995
+        "skip", "skip", # PIB, consumo x 1.000.000
+        "skip", "skip", "skip", # POP Cubic, POP Denton, POP linear
+        "skip", "skip", # PIB per cabita Cubic, PIB per capita Denton
+        "skip", # consumo per capita Cubic
+        "skip", 
+        "numeric", "numeric", # PIB, consumo - VALORES ENCADEADOS A PREÇOS DE 1995 COM AJUSTE
+        "skip", "skip", # PIB, consumo x 1.000.000
+        "skip", "skip", "skip", # POP Cubic, POP Denton, POP linear
+        "skip", "skip", # PIB per cabita Cubic, PIB per capita Denton
+        "skip", # consumo per capita Cubic
+        "skip",
+        "skip", # período SÉRIE ENCADEADA DO ÍNDICE DE VOLUME TRIMESTRAL COM AJUSTE SAZONAL
+        "skip","skip", # PIB, consumo
+        "skip",
+        "skip","skip" # PIB, consumo SÉRIE ENCADEADA DO ÍNDICE DE VOLUME TRIMESTRAL 
+        )
+  } else if (x == "A2"){
+        colunas <- c("text", #período
+        "skip", "skip", # PIB, consumo - VALORES ENCADEADOS A PREÇOS DE 1995
+        "skip", "skip", # PIB, consumo x 1.000.000
+        "skip", "skip", "skip", # POP Cubic, POP Denton, POP linear
+        "skip", "skip", # PIB per cabita Cubic, PIB per capita Denton
+        "skip", # consumo per capita Cubic
+        "skip", 
+        "skip", "skip", # PIB, consumo - VALORES ENCADEADOS A PREÇOS DE 1995 COM AJUSTE
+        "skip", "skip", # PIB, consumo x 1.000.000
+        "skip", "skip", "skip", # POP Cubic, POP Denton, POP linear
+        "skip", "skip", # PIB per cabita Cubic, PIB per capita Denton
+        "skip", # consumo per capita Cubic
+        "skip",
+        "skip", # período SÉRIE ENCADEADA DO ÍNDICE DE VOLUME TRIMESTRAL COM AJUSTE SAZONAL
+        "skip","skip", # PIB, consumo
+        "skip",
+        "numeric","numeric" # PIB, consumo SÉRIE ENCADEADA DO ÍNDICE DE VOLUME TRIMESTRAL 
+        )
+  } else if (x == "A3"){
+        colunas <- c("text", #período
+        "skip", "skip", # PIB, consumo - VALORES ENCADEADOS A PREÇOS DE 1995
+        "skip", "skip", # PIB, consumo x 1.000.000
+        "skip", "skip", "skip", # POP Cubic, POP Denton, POP linear
+        "skip", "skip", # PIB per cabita Cubic, PIB per capita Denton
+        "skip", # consumo per capita Cubic
+        "skip", 
+        "skip", "skip", # PIB, consumo - VALORES ENCADEADOS A PREÇOS DE 1995 COM AJUSTE
+        "skip", "skip", # PIB, consumo x 1.000.000
+        "skip", "skip", "skip", # POP Cubic, POP Denton, POP linear
+        "skip", "skip", # PIB per cabita Cubic, PIB per capita Denton
+        "skip", # consumo per capita Cubic
+        "skip",
+        "skip", # período SÉRIE ENCADEADA DO ÍNDICE DE VOLUME TRIMESTRAL COM AJUSTE SAZONAL
+        "numeric","numeric", # PIB, consumo
+        "skip",
+        "skip","skip" # PIB, consumo SÉRIE ENCADEADA DO ÍNDICE DE VOLUME TRIMESTRAL 
+        )
+  } else if (x == "B0"){
+        colunas <- c("text", #período
+        "skip", "skip", # PIB, consumo - VALORES ENCADEADOS A PREÇOS DE 1995
+        "skip", "skip", # PIB, consumo x 1.000.000
+        "skip", "skip", "skip", # POP Cubic, POP Denton, POP linear
+        "numeric", "skip", # PIB per cabita Cubic, PIB per capita Denton
+        "numeric", # consumo per capita Cubic
+        "skip", 
+        "skip", "skip", # PIB, consumo - VALORES ENCADEADOS A PREÇOS DE 1995 COM AJUSTE
+        "skip", "skip", # PIB, consumo x 1.000.000
+        "skip", "skip", "skip", # POP Cubic, POP Denton, POP linear
+        "skip", "skip", # PIB per cabita Cubic, PIB per capita Denton
+        "skip", # consumo per capita Cubic
+        "skip",
+        "skip", # período SÉRIE ENCADEADA DO ÍNDICE DE VOLUME TRIMESTRAL COM AJUSTE SAZONAL
+        "skip","skip", # PIB, consumo
+        "skip",
+        "skip","skip" # PIB, consumo SÉRIE ENCADEADA DO ÍNDICE DE VOLUME TRIMESTRAL 
+        )
+  } else if (x == "B1"){
+        colunas <- c("text", #período
+        "skip", "skip", # PIB, consumo - VALORES ENCADEADOS A PREÇOS DE 1995
+        "skip", "skip", # PIB, consumo x 1.000.000
+        "skip", "skip", "skip", # POP Cubic, POP Denton, POP linear
+        "skip", "skip", # PIB per cabita Cubic, PIB per capita Denton
+        "skip", # consumo per capita Cubic
+        "skip", 
+        "skip", "skip", # PIB, consumo - VALORES ENCADEADOS A PREÇOS DE 1995 COM AJUSTE
+        "skip", "skip", # PIB, consumo x 1.000.000
+        "skip", "skip", "skip", # POP Cubic, POP Denton, POP linear
+        "numeric", "skip", # PIB per cabita Cubic, PIB per capita Denton
+        "numeric", # consumo per capita Cubic
+        "skip",
+        "skip", # período SÉRIE ENCADEADA DO ÍNDICE DE VOLUME TRIMESTRAL COM AJUSTE SAZONAL
+        "skip","skip", # PIB, consumo
+        "skip",
+        "skip","skip" # PIB, consumo SÉRIE ENCADEADA DO ÍNDICE DE VOLUME TRIMESTRAL 
+        )
+  }
+  informacao <- read_xls(arquivo.real, col_types = colunas, skip = 1)
+  dados.reais <<- informacao[,c(1,3)]
+  pib.per.capita <<- informacao[,c(1,2)]
+  colnames(pib.per.capita) <- c("data", "pib")
+}
+
+
+modelo(modelo.escolhido)
+
+
+
+```
+Agora o programa puxará e transformará os dados das tabelas dadas. Temos duas funções para isso: extrair.série.real e extrair.série.modelada. 
+```{r função para puxar dados, }
+extrair.série.real <- function(x){
+  consumo.real <- read_excel(x, 
+    col_types = c("skip", "skip", "skip", 
+        "numeric", "numeric"))
+  colnames(consumo.real) <- c("ano", "consumo")
+  return(consumo.real)
+}
+
+extrair.série.modelada <- function(dados){
+  modelo <- read_csv(dados, 
+    col_types = cols(`População-inicial` = col_skip()), 
+    skip = 6)
+ colnames(modelo) <- c("run", "porc.plan", "lembranca", "tick", "consumo")
+  return(modelo)
+}
+```
+Após criar funções, aplicamos.
+```{r puxar os dados, include=FALSE}
+setwd("~/mono2")
+consumo.real <- dados.reais
+colnames(consumo.real) <- c("data", "consumo")
+consumo.modelado <- extrair.série.modelada(dados.modelagem)
+```
+Normalização e denormalização dos dados:
+```{r normalização e denormalização,}
+normalizar <- function(serie){
+  media <- mean(serie)
+  desvio.padrão <- sd(serie)
+  serie.normalizada <- c()
+  for(observação in serie){
+    dado.normalizado <- (observação - media) / desvio.padrão
+    serie.normalizada <- c(serie.normalizada, dado.normalizado)
+  }
+  return(serie.normalizada)
+}
+
+denormalizacao <- function(serie.modelada, serie.real){
+  media <- mean(serie.real)
+  desvio.padrão <- sd(serie.real)
+  serie.denormalizada <- c()
+  for(valor.estimado in serie.modelada){
+    dado.denormalizado <- valor.estimado * desvio.padrão + media
+    serie.denormalizada <- c(serie.denormalizada, dado.denormalizado)
+  }
+  return(serie.denormalizada)
+}
+```
+Comparar dados:
+```{r comparar dados,}
+comparar <- function(serie.modelada, serie.real){
+  serie.modelada <- serie.modelada
+  serie.real <-serie.real
+  tamanho <- length(serie.real)
+  somatório <- c()
+  for(i in 1:tamanho){
+    estimado <- serie.modelada[i]
+    observado <- serie.real[i]
+    valor <- ((observado - estimado) ** 2) / tamanho
+    somatório <- c(somatório, valor)
+  }
+  somatório <- sum(somatório)
+  return(somatório)
+}
+```
+R² dos dados
+```{r função R²,}
+r2 <- function(serie.modelada, serie.real){
+  serie.modelada <- serie.modelada
+  serie.real <-serie.real
+  tamanho <- length(serie.real)
+  somatório.res <- c()
+  somatório.total <- c()
+  for(i in 1:tamanho){
+    estimado <- serie.modelada[i]
+    observado <- serie.real[i]
+    valor <- ((observado - estimado) ** 2) / tamanho
+    somatório.res <- c(somatório.res, valor)
+  }
+  for(i in 1:tamanho){
+    observado <- serie.real[i]
+    media.real <- mean(serie.real[1:tamanho])
+    valor <- ((observado - media.real) ** 2) / tamanho
+    somatório.total <- c(somatório.total, valor)
+  }
+  somatório.res <- sum(somatório.res)
+  somatório.total <- sum(somatório.total)
+  somatório <- 1 - (somatório.res/somatório.total)
+  return(somatório)
+}
+```
+Limpando e Normalizando os dados
+```{r limpar e normalizar dados,}
+# Dados Observados 
+consumo.real <- consumo.real %>%
+  mutate("consumo.normalizado" = normalizar(consumo))
+  
+# Dados Modelados
+consumo.modelado.analise <- consumo.modelado %>%
+  arrange(run,tick) %>%
+  group_by(run) %>%
+  mutate("tick" = (tick / 4) + 1996) %>%
+  rename( "ano" = "tick") %>%
+  #filter(ano < 2019) %>% 
+  mutate("consumo.normalizado" = normalizar(consumo))
+```
+
+## Descrição
+Fazemos então uma análise para encontrar o valor de melhor encaixe.
+```{r obter resultados de descrição,}
+resultados.finais <- consumo.modelado.analise %>%
+  arrange(run,ano) %>%
+  group_by(porc.plan, lembranca) %>%
+  summarise("indice" = comparar(consumo.normalizado, consumo.real$consumo.normalizado)) %>%
+  mutate("indice.inverso" = (1 / indice) ** 2) %>%
+  arrange(indice)
+```
+
+```{r obter resultados de descrição brutos,}
+resultados.finais.brutos <- consumo.modelado.analise %>%
+  arrange(run,ano) %>%
+  group_by(porc.plan, lembranca) %>%
+  summarise("indice" = comparar(consumo / 1000, consumo.real$consumo)) %>%
+  mutate("indice.inverso" = (1 / indice) ** 2) %>%
+  arrange(indice)
+```
+
+```{r gráficos de analise descritiva,}
+# Análise 3d 
+plot_ly(resultados.finais, x = ~indice, y = ~porc.plan, z = ~lembranca, size = ~indice, color = ~indice.inverso)
+
+# Análise por pares
+plot(resultados.finais[,1:3])
+
+# Waffle plot
+ggplot(resultados.finais) + geom_raster(aes(x = porc.plan, y = lembranca, fill = indice.inverso, colour = "black")) + scale_fill_gradientn(colours=c("black","white"))
+
+# Comparar o melhor
+otimo <- consumo.modelado.analise %>%
+  filter(porc.plan == resultados.finais[1,1], lembranca == resultados.finais[1,2]) %>%
+  select(ano, consumo, consumo.normalizado) %>% 
+  ungroup() %>% 
+  select(-run) %>%
+  rename("data" = ano)
+otimo$Dados <- "Consumo Modelado"
+real <- consumo.real %>%
+  mutate(data = otimo$data) 
+real$Dados <- "Consumo Real"
+comparação <- rbind.data.frame(otimo,real)
+ggplot(comparação, aes(x = data, y = consumo.normalizado, linetype = Dados)) + geom_line()  + xlab("Trimestres") + ylab("Consumo Normalizado")  +  theme(plot.caption = element_text(hjust = 0), plot.title=element_text(family="Times", face="bold", size=12), legend.position = "none")  + ggtitle("Comparação do consumo modelado e consumo real, ambos normalizados") + labs(caption = "Elaboração própia.")
+```
+
+
+# Análise do consumo real
+
+
+```{r}
+require(astsa)
+
+testando.consumo <- consumo.real$consumo.normalizado
+testando.modelo <- otimo$consumo.normalizado
+
+# Analisando consumo agregado real
+ts.plot(testando.consumo)
+ts.plot(testando.modelo)
+acf(testando.consumo)
+acf(testando.modelo)
+pacf(testando.consumo)
+pacf(testando.modelo)
+ar(testando.consumo)
+ar(testando.modelo)
+
+sarima(testando.consumo,0,1,0)
+sarima(testando.modelo,0,1,0)
+
+```
