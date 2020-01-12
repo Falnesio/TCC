@@ -1,6 +1,6 @@
 ;; Elementos globais do modelo
 globals [
-  renda-média                       ;; Renda média de todo o plano
+  renda                      ;; Renda média de todo o plano
   memória                           ;; memória dos agentes
   serie-real
 ]
@@ -31,7 +31,7 @@ patches-own [
 ;;  O que ocorre a cada passo de tempo no modelo
 to go
   ask patches [set prenda item ticks serie-real]
-  set renda-média mean [prenda] of turtles
+  set renda item ticks serie-real
   adquirir-memória
   ask turtles [
     set riqueza riqueza + prenda ;;- Adquirir renda
@@ -84,7 +84,7 @@ end
 ;; Costrução específica para planejadores
 to setup-planejadores
   set color blue ;; Colocar cor azul
-  set consumo renda-média ;; Consumo inicial
+  set consumo renda ;; Consumo inicial
 end
 
 ;; Construção específica para imediatistas
@@ -113,7 +113,7 @@ to agente-consome
 end
 
 to adquirir-memória
-  set memória insert-item 0 memória renda-média
+  set memória insert-item 0 memória renda
   if (length memória > lembrança) [
     set memória remove-item lembrança memória
   ]
@@ -121,21 +121,21 @@ end
 
 to avaliar-pmgc
   ask turtles [
-    ifelse (prenda = renda-passada)[
-      ifelse (consumo-passado = consumo) [
-        let variação-renda 1
-        let variação-consumo 1
-        set pmgc 1
-      ][
-        let variação-renda 1
-        let variação-consumo (consumo - consumo-passado)
-        set pmgc variação-consumo / variação-renda
-      ]
-    ][
+;    ifelse (prenda = renda-passada)[
+;      ifelse (consumo-passado = consumo) [
+;        let variação-renda 1
+;        let variação-consumo 1
+;        set pmgc 1
+;      ][
+;        let variação-renda 1
+;        let variação-consumo (consumo - consumo-passado)
+;        set pmgc variação-consumo / variação-renda
+;      ]
+;    ][
       let variação-renda (prenda - renda-passada)
       let variação-consumo (consumo - consumo-passado)
       set pmgc variação-consumo / variação-renda
-    ]
+;    ]
     set renda-passada prenda
     set consumo-passado consumo
   ]
